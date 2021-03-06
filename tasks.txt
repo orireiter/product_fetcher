@@ -1,0 +1,21 @@
+* Write tests!!!
+
+* Choose a DB. ( SQL or NoSQL )
+
+* Use config file(s) or ENV var(s).
+
+* Write a service to fetch data from amazon.
+
+* Write a service to fetch data from walmart (!!!mind the headers TTL!!!).
+
+* Write a service to GET data from the DB.
+
+* Write a service to INSERT data to the DB.
+
+* Write an API that will insert the clients' request(s) into the system.
+
+* Mind the efficiency ( async, concurrent, design patterns).
+
+* Write tests!!!
+
+* Containerize and keep dockerfile(s) / docker-compose.yml(s).
