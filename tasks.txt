@@ -6,7 +6,7 @@
 
 * Write a service to fetch data from amazon.
 
-* Write a service to fetch data from walmart (!!!mind the headers TTL!!!).
+* Write a service to fetch data from walmart (!!!mind the headers' TTL!!!).
 
 * Write a service to GET data from the DB.
 

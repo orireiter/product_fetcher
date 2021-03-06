@@ -1,0 +1,5 @@
+RabbitMQ:
+    host: localhost
+    queues:
+      amzn_queue: amzn
+      
