@@ -1,5 +1,13 @@
 RabbitMQ:
-    host: localhost
-    queues:
-      amzn_queue: amzn
-      
+  host: localhost
+  queues:
+    amzn_queue: amzn
+    wlmrt_queue: wlmrt
+    db_writer_queue: db_write
+
+MongoDB:
+  host: localhost
+  db: products
+  collections:
+    amazon: amazon
+    walmart: walmart
