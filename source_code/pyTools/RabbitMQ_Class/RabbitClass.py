@@ -378,13 +378,14 @@ class Rabbit:
         '''
               Receives a message, executes a function with it and returns an answer.
               Can consume endless messages.
+              Check send_n_receive for more info.
 
               Parameters
               ----------
               queue_name: str
-                    Queue name to send the message to.
+                    Queue name to receive messages from.
               func: function
-                    The function that will be use the message.
+                    The function that will use the message.
 
               Raises
               ------

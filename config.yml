@@ -4,6 +4,7 @@ RabbitMQ:
     amzn_queue: amzn
     wlmrt_queue: wlmrt
     db_writer_queue: db_write
+    db_reader_queue: db_reader
 
 MongoDB:
   host: localhost
@@ -11,3 +12,11 @@ MongoDB:
   collections:
     amazon: amazon
     walmart: walmart
+
+Amazon:
+  api: https://ebazon-prod.herokuapp.com/ybl_assignment/amazon/
+
+Walmart:
+  api: https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items/
+  headers_api: https://ebazon-prod.herokuapp.com/ybl_assignment/walmart/headers
+  headers_json: ./wlmrt_headers.json

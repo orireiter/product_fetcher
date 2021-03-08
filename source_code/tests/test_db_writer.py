@@ -13,9 +13,9 @@ import pytest
 
 
 @pytest.mark.parametrize('body,expected', [
-    ({"_id": 12345, "name": "ori", "gever": "ken", "source": "amazon"}, "None")
+    ({"name": "ori", "gever": "ken", "source": "amazon"}, "None")
 ])
-def test_amzn_fetcher(body, expected):
+def test_db_writer(body, expected):
 
     rbt_conn = Rabbit(host=get_conf(['RabbitMQ', 'host']))
     rbt_conn.declare_queue(

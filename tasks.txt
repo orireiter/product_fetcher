@@ -1,17 +1,28 @@
 * Write tests!!!
+    - should put emphasis
 
 * Choose a DB. ( SQL or NoSQL )
+    - chose mongodb
 
 * Use config file(s) or ENV var(s).
+    - using shared yml
 
 * Write a service to fetch data from amazon.
+    - wrote basic version. exceptions and efficiency need to be considered.
+    - maybe use regex to confirm id.
+    - put api urls in config instead of constants.
+    - instead of manually building a dict, make a function from it to unpack stuff.
 
 * Write a service to fetch data from walmart (!!!mind the headers' TTL!!!).
+    - wrote basic version. exceptions and efficiency need to be considered.
 
 * Write a service to GET data from the DB.
-
+    - wrote basic version. exceptions and efficiency need to be considered.
+    - use fix json quotings function.
+    
 * Write a service to INSERT data to the DB.
-
+    - wrote basic version. exceptions and efficiency need to be considered.
+    
 * Write an API that will insert the clients' request(s) into the system.
 
 * Mind the efficiency ( async, concurrent, design patterns).

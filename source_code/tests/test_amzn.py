@@ -13,7 +13,8 @@ import pytest
 
 
 @pytest.mark.parametrize('body,expected', [
-    ("B071VG5N3151353D", "None")
+    ("B071VG5N3151353D", "None"),
+    ("B07DQWT15Y", "None")
 ])
 def test_amzn_fetcher(body, expected):
 
