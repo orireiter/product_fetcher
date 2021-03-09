@@ -1,10 +1,10 @@
 RabbitMQ:
   host: localhost
   queues:
-    amzn_queue: amzn
-    wlmrt_queue: wlmrt
+    amazon_queue: amzn
+    walmart_queue: wlmrt
     db_writer_queue: db_write
-    db_reader_queue: db_reader
+    db_reader_queue: db_read
 
 MongoDB:
   host: localhost
@@ -15,8 +15,22 @@ MongoDB:
 
 Amazon:
   api: https://ebazon-prod.herokuapp.com/ybl_assignment/amazon/
+  keys:
+    - - _id
+    - - source
+    - - title
+    - - price
 
 Walmart:
   api: https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items/
   headers_api: https://ebazon-prod.herokuapp.com/ybl_assignment/walmart/headers
-  headers_json: ./wlmrt_headers.json
+  headers_json: ./walmart_headers.json
+  keys:
+    - - itemId
+      - _id
+    - - name
+      - title
+    - - salePrice
+      - price
+    - - sellerInfo
+      - source

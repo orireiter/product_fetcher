@@ -1,6 +1,6 @@
 from pyTools.mongo import db_connect
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf
+from pyTools.extra_tools import get_conf, fix_json_quotings
 from json import loads
 
 
@@ -8,10 +8,10 @@ from json import loads
 # A queue to listen to,
 # The MongoDB host to connect to,
 # A DB to query in MongoDB.
-RABBIT_HOST = get_conf(['RabbitMQ', 'host'])
-RABBIT_DB_READER_QUEUE = get_conf(['RabbitMQ', 'queues', 'db_reader_queue'])
-MONGO_HOST = get_conf(['MongoDB', 'host'])+":"+"27017"
-MONGO_DB = get_conf(['MongoDB', 'db'])
+RABBIT_HOST = get_conf('RabbitMQ', 'host')
+RABBIT_DB_READER_QUEUE = get_conf('RabbitMQ', 'queues', 'db_reader_queue')
+MONGO_HOST = get_conf('MongoDB', 'host')+":"+"27017"
+MONGO_DB = get_conf('MongoDB', 'db')
 
 # Initializing a rabbit object and declaring the queue it will consume from.
 db_reader = Rabbit(host=RABBIT_HOST)
@@ -26,15 +26,12 @@ def read_from_db(msg):
     # They're replaced as to not interrupt with
     # converting the string to a dict.
     msg_as_str = msg.decode('utf-8')
-    msg_as_str = msg_as_str.replace("'", '"')
-
-    msg_as_dict = loads(msg_as_str)
+    msg_as_dict = fix_json_quotings(msg_as_str)
 
     # Assigning the collection according to the source of the product.
     # This is not a constant because this function will serve multiple
     # collections.
-    collection = get_conf(
-        ['MongoDB', 'collections', msg_as_dict['source']])
+    collection = get_conf('MongoDB', 'collections', msg_as_dict['source'])
 
     # Creating a full connection string to the DB.
     mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)

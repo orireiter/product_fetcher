@@ -1,30 +1,33 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf
+from pyTools.extra_tools import get_conf, dictionary_repacker
 from json import loads
 import requests
 
 # The RabbitMQ host to connect to,
 # A queue to listen to,
-# An API to query.
-RABBIT_HOST = get_conf(['RabbitMQ', 'host'])
-RABBIT_AMZN_QUEUE = get_conf(['RabbitMQ', 'queues', 'amzn_queue'])
-AMZN_API = get_conf(["Amazon", "api"])
+# An API to query,
+# A list of json keys to be replaced with normalized
+# keys used everywhere in this system.
+RABBIT_HOST = get_conf('RabbitMQ', 'host')
+RABBIT_AMAZON_QUEUE = get_conf('RabbitMQ', 'queues', 'amazon_queue')
+AMAZON_API = get_conf('Amazon', 'api')
+AMAZON_JSON_KEYS = get_conf('Amazon', 'keys')
 
 
 # Initializing a rabbit object and declaring the queue it will consume from.
-amzn_fetcher = Rabbit(host=RABBIT_HOST)
-amzn_fetcher.declare_queue(RABBIT_AMZN_QUEUE, durable=True)
+amazon_fetcher = Rabbit(host=RABBIT_HOST)
+amazon_fetcher.declare_queue(RABBIT_AMAZON_QUEUE, durable=True)
 
 
 # The function that will be executed when a message is consumed.
 # It will use the ID in the msg to try and fetch
 # info about a product from amazon.
-def fetch_amzn_prdct(msg):
+def fetch_amazon_product(msg):
     # First, the message is decoded to string
     msg_as_str = msg.decode('utf-8')
 
     try:
-        product = requests.get(AMZN_API+msg_as_str)
+        product = requests.get(AMAZON_API+msg_as_str)
     except requests.exceptions.ConnectionError:
         return "ERROR: Couldn't connect to amazon API"
 
@@ -32,12 +35,9 @@ def fetch_amzn_prdct(msg):
     # Otherwise, the result (regarding the product)
     # is unpacked and is sent back to Rabbit.
     if product.status_code == 200:
-        full_product_dict = loads(product.text)
-        relevant_product_dict = {'id': msg_as_str,
-                                 'title': full_product_dict["data"]["title"],
-                                 'price': full_product_dict["data"]["price"],
-                                 'source': 'amazon'
-                                 }
+        full_product_dict = loads(product.text)['data']
+        relevant_product_dict = dictionary_repacker(
+            full_product_dict, AMAZON_JSON_KEYS)
         return relevant_product_dict
     else:
         return None
@@ -48,4 +48,4 @@ def fetch_amzn_prdct(msg):
 # the message as a parameter.
 # The return of the callback function is sent back to RabbitMQ.
 # For more information check the class docstrings.
-amzn_fetcher.receive_n_send_many(RABBIT_AMZN_QUEUE, fetch_amzn_prdct)
+amazon_fetcher.receive_n_send_many(RABBIT_AMAZON_QUEUE, fetch_amazon_product)
