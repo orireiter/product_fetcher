@@ -4,7 +4,8 @@ rabbitmq:
     amazon_queue: amazon
     walmart_queue: walmart
     db_writer_queue: db_write
-    db_reader_queue: db_read
+    db_reader_queue: db_read_by_id
+    db_filter_queue: db_read_by_filter
 
 mongodb:
   host: mongodb
@@ -42,6 +43,13 @@ walmart:
       - source
 
 db_reader:
+  depends_on:
+    - - rabbitmq
+      - 5672
+    - - mongodb
+      - 27017
+
+db_filter:
   depends_on:
     - - rabbitmq
       - 5672

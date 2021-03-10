@@ -1,6 +1,7 @@
-from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from source_code.pyTools.extra_tools import get_conf
 import pytest
+from source_code.pyTools.extra_tools import get_conf
+from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
+
 
 # POST_TESTS
 #========================================================#
@@ -13,8 +14,8 @@ import pytest
 
 
 @pytest.mark.parametrize('body,expected', [
-    ("B071VG5N3151353D", "None"),
-    ("B07DQWT15Y", "None")
+    ('B071VG5N3151353D', 'None'),
+    ('B07DQWT15Y', 'None')
 ])
 def test_amazon_fetcher(body, expected):
 
@@ -26,4 +27,4 @@ def test_amazon_fetcher(body, expected):
         get_conf('rabbitmq', 'queues', 'amazon_queue'), body)
 
     # Validate response headers and body contents, e.g. status code.
-    assert result.replace("b'", "").replace("'", "") == expected
+    assert result.replace('b', '').replace("'", "") == expected

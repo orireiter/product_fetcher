@@ -1,6 +1,7 @@
-from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from source_code.pyTools.extra_tools import get_conf
 import pytest
+from source_code.pyTools.extra_tools import get_conf
+from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
+
 
 # POST_TESTS
 #========================================================#
@@ -13,7 +14,7 @@ import pytest
 
 
 @pytest.mark.parametrize('body,expected', [
-    ("4837473", "None")
+    ('4837473', 'None')
 ])
 def test_walmart_fetcher(body, expected):
 
@@ -25,4 +26,4 @@ def test_walmart_fetcher(body, expected):
         get_conf('rabbitmq', 'queues', 'walmart_queue'), body)
 
     # Validate response headers and body contents, e.g. status code.
-    assert result.replace("b'", "").replace("'", "") == expected
+    assert result.replace('b', '').replace("'", '') == expected

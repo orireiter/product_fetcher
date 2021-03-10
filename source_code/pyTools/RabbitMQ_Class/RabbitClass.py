@@ -263,14 +263,14 @@ class Rabbit:
             self.declare_queue(queue_name, True)
 
         except:
-            return(f"ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.")
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
 
         self.channel.basic_publish(exchange=exchange_name,
                                    routing_key=queue_name,
                                    body=str(message),
                                    properties=pika.BasicProperties(delivery_mode=2,))
 
-        return(f"SUCCESS: Message sent to queue named => {queue_name}")
+        return(f'SUCCESS: Message sent to queue named => {queue_name}')
 
     def send_n_receive(self, queue_name: str, message: str, exchange_name=''):
         '''
@@ -357,7 +357,7 @@ class Rabbit:
         try:
             self.declare_queue(queue_name, True)
         except:
-            return(f"ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.")
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
 
         def callback(ch, method, properties, body):
             try:
@@ -407,7 +407,7 @@ class Rabbit:
         try:
             self.declare_queue(queue_name, True)
         except:
-            return(f"ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.")
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
 
         def callback(ch, method, properties, body):
             try:
@@ -452,7 +452,7 @@ class Rabbit:
         try:
             self.declare_queue(queue_name, True)
         except:
-            return(f"ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.")
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
 
         def callback(ch, method, properties, body):
             try:
@@ -491,7 +491,7 @@ class Rabbit:
         try:
             self.declare_queue(queue_name, True)
         except:
-            return(f"ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.")
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
 
         def callback(ch, method, properties, body):
             try:

@@ -33,7 +33,7 @@ def get_conf(*key_list):
             conf = conf[key]
         return conf
     except KeyError:
-        raise Exception("ERROR: one of the keys given does NOT exist")
+        raise Exception('ERROR: one of the keys given does NOT exist')
 
 
 def dictionary_repacker(dictionary: dict,
@@ -44,7 +44,7 @@ def dictionary_repacker(dictionary: dict,
         key paired with a new key (or without it to keep the same name).
         It will return a new dictionary discarded of not given keys.
         \n
-        before_dictionary = {"name": "ori", "age": 21, "address": "tlv"}\n
+        before_dictionary = {'name': 'ori', 'age': 21, 'address': 'tlv'}\n
         renew_keys = [['name', 'full_name'], ['age']]\n
         print(dictionary_repacker(before_dictionary, renew_keys))\n
         -> {'full_name': 'ori', 'age': 21}
@@ -78,20 +78,20 @@ def wait_for_dependencies(*host_n_port_pairs):
         and prevent it form crashing.\n
         --------
         example:\n
-        wait_for_dependencies(["localhost", 27017], ["rabbit.srv", 15672])
+        wait_for_dependencies(['localhost', 27017], ['rabbit.srv', 15672])
     '''
     for host_n_port in host_n_port_pairs:
         is_up = False
         while is_up == False:
             available = check_if_port_is_open(*host_n_port)
             if available:
-                print(f"Connected to {host_n_port}!")
+                print(f'Connected to {host_n_port}!')
                 is_up = True
                 sleep(2)
             else:
-                print(f"Waiting for {host_n_port}")
+                print(f'Waiting for {host_n_port}')
                 sleep(2)
-    print("Will initialize service in 5 seconds.")
+    print('Will initialize service in 5 seconds.')
     sleep(5)
 
 
@@ -99,17 +99,17 @@ def is_configuration_n_rabbit_up():
     # Upon execution, first wait until it can find the config,
     # and can connect to the rabbit server.
     is_rabbit_up, is_conf_up = False, False
-    print("awaiting config")
+    print('awaiting config')
     while is_conf_up is False:
         try:
             rabbit_host = get_conf('rabbitmq', 'host')
             is_conf_up = True
         except:
             sleep(1)
-    print("awaiting connection to RabbitMQ")
+    print('awaiting connection to RabbitMQ')
     while is_rabbit_up is False:
         try:
-            print("attempt")
+            print('attempting to connect to rabbitmq')
             rab = Rabbit(host=rabbit_host)
             is_rabbit_up = True
             rab.close_connection()

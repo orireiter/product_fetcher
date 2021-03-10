@@ -8,11 +8,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-ADD ./docker/db_reader/requirements.txt .
+ADD ./docker/db_reader_by_filter/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
-ADD ./source_code/db_reader.py /app/
+ADD ./source_code/db_reader_by_filter.py /app/
 COPY ./source_code/pyTools /app/pyTools
 ADD ./source_code/__init__.py /app/
 
@@ -21,4 +21,4 @@ RUN useradd appuser && chown -R appuser /app
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "db_reader.py"]
+CMD ["python", "db_reader_by_filter.py"]

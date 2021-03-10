@@ -20,25 +20,24 @@
 
 * Write a service to GET data from the DB.
     - wrote basic version. exceptions and efficiency need to be considered.
-    - how to act when database is unavailable?
+    - how to act when database is unavailable? WRITE_AHEAD_LOG
     
 * Write a service to INSERT data to the DB.
     - wrote basic version. exceptions and efficiency need to be considered.
     
 * Write an API that will insert the clients' request(s) into the system.
-
+    - wrote basic version
+    
 * Mind the efficiency ( async, concurrent, design patterns).
 
 * Write tests!!!
 
-* maybe add decorator for decoding messages.
+$ maybe add decorator for decoding messages.
 
-* Containerize and keep dockerfile(s) / docker-compose.yml(s).
+$ Containerize and keep dockerfile(s) / docker-compose.yml(s).
  
 * rabbitmq should i use exchanges?
 
-* ensure consistency of jsons ( from web its dict and db its a dict in a list )
-
-* consistency of qoutes and global imports first.
+$ ensure consistency of jsons ( from web its dict and db its a dict in a list )
 
 * block DOS ?

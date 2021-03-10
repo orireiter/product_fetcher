@@ -1,7 +1,7 @@
-from pyTools.extra_tools import get_conf
-from json import loads, dump
-from time import sleep
 import requests
+from time import sleep
+from json import loads, dump
+from pyTools.extra_tools import get_conf
 
 
 # An API to query for walmart headers.

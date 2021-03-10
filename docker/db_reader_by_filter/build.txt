@@ -1,0 +1,1 @@
+docker build -t db_reader_by_filter:0.0.2 -f .\docker\db_reader_by_filter\Dockerfile .

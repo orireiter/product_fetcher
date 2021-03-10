@@ -11,5 +11,5 @@ def db_connect(connection_string: str, db: str, collection: str):
         return db_client[db][collection]
 
     except:
-        print("Error: db related")
-        raise Exception("Error: db related")
+        print('Error: db related')
+        raise Exception('Error: db related')

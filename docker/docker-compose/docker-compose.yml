@@ -15,11 +15,13 @@ services:
     deploy:
       replicas: 1
     container_name: mongodb
+    ports:
+      - 27017:27017
     networks:
       - yaballe_API
 
   amazon_fetcher:
-    image: amazon_fetcher:0.0.1
+    image: amazon_fetcher:0.0.2
     deploy:
       replicas: 1
     networks:
@@ -28,7 +30,7 @@ services:
       - ./config.yml:/app/config.yml
 
   walmart_fetcher:
-    image: walmart_fetcher:0.0.1
+    image: walmart_fetcher:0.0.2
     deploy:
       replicas: 1
     networks:
@@ -38,7 +40,7 @@ services:
       - ./walmart_headers.json:/app/walmart_headers.json
 
   walmart_header_fetcher:
-    image: walmart_header_fetcher:0.0.1
+    image: walmart_header_fetcher:0.0.2
     deploy:
       replicas: 1
     networks:
@@ -47,8 +49,8 @@ services:
       - ./config.yml:/app/config.yml
       - ./walmart_headers.json:/app/walmart_headers.json
 
-  web_api:
-    image: web_server:0.0.1
+  web_server:
+    image: web_server:0.0.2
     deploy:
       replicas: 1
     networks:
@@ -59,8 +61,18 @@ services:
     ports:
       - 80:80
 
-  db_reader:
-    image: db_reader:0.0.1
+  db_reader_by_id:
+    image: db_reader_by_id:0.0.2
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+
+  
+  db_reader_by_filter:
+    image: db_reader_by_filter:0.0.2
     deploy:
       replicas: 1
     networks:
@@ -69,7 +81,7 @@ services:
       - ./config.yml:/app/config.yml
 
   db_writer:
-    image: db_writer:0.0.1
+    image: db_writer:0.0.2
     deploy:
       replicas: 1
     networks:

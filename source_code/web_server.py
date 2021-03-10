@@ -1,8 +1,10 @@
-from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf, wait_for_dependencies, is_configuration_n_rabbit_up
-from flask import Flask, request, jsonify
-from json import loads, dumps
 import re
+from json import loads, dumps
+from flask import Flask, request, jsonify
+from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
+from pyTools.extra_tools import get_conf, wait_for_dependencies
+from pyTools.extra_tools import is_configuration_n_rabbit_up
+
 
 # doesn't start the app until the config file
 # and rabbit are both available.
@@ -19,6 +21,7 @@ RABBIT_AMAZON_QUEUE = get_conf('rabbitmq', 'queues', 'amazon_queue')
 RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
 RABBIT_DB_READER_QUEUE = get_conf('rabbitmq', 'queues', 'db_reader_queue')
 RABBIT_DB_WRITER_QUEUE = get_conf('rabbitmq', 'queues', 'db_writer_queue')
+RABBIT_DB_FILTER_QUEUE = get_conf('rabbitmq', 'queues', 'db_filter_queue')
 
 
 # Initialize the flask server and rabbit object
@@ -47,18 +50,19 @@ rabbit.declare_queue(RABBIT_DB_WRITER_QUEUE, durable=True)
 '''
 
 
-@app.route('/<string:source>/<string:_id>', methods=['GET'])
-def get(source: str, _id: str):
+@app.route('/fetch/<string:source>/<string:_id>', methods=['GET'])
+def fetch_by_id(source: str, _id: str):
     # making sure the right urls are queried.
     if source != 'amazon' and source != 'walmart':
-        return("ERROR: source given must be either amazon or walmart."), 403
+        return('ERROR: source given must be either amazon or walmart.'), 403
     # making sure the id contains only uppercase letter and numbers.
     elif not re.search(r'^[0-9A-Z]+$', str(_id)):
         return('ERROR: product ID given can contain only uppercase letters and numbers.'), 403
     else:
         record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
             {'_id': _id, 'source': f'{source}.com'}))
-        if record == '[]':
+        record = loads(record)
+        if record == None:
             result = rabbit.send_n_receive(
                 get_conf('rabbitmq', 'queues', f'{source}_queue'), _id)
 
@@ -69,7 +73,31 @@ def get(source: str, _id: str):
                 # print(result)
                 result = loads(result)
                 result['source'] = result['source'].lower()
+                result['_id'] = str(result['_id'])
                 rabbit.send_one(RABBIT_DB_WRITER_QUEUE, dumps(result))
                 return jsonify(result)
         else:
-            return jsonify(loads(record))
+            return jsonify(record)
+
+
+@app.route('/filter/<string:source>', methods=['GET'])
+def filter_by_price(source: str):
+
+    greater_than_or_equal = request.args.get('gte')
+    lesser_than_or_equal = request.args.get('lte')
+
+    # making sure the right urls are queried.
+    if source != 'amazon' and source != 'walmart':
+        return('ERROR: source given must be either amazon or walmart.'), 403
+    # making sure the id contains only uppercase letter and numbers.
+    elif not re.search(r'^[0-9]+$', str(greater_than_or_equal)):
+        return('ERROR: price values can contain only numbers.'), 403
+    elif not re.search(r'^[0-9]+$', str(lesser_than_or_equal)):
+        return('ERROR: price values can contain only numbers.'), 403
+    else:
+        record = rabbit.send_n_receive(RABBIT_DB_FILTER_QUEUE, dumps(
+            {'$gte': int(greater_than_or_equal),
+             '$lte': int(lesser_than_or_equal),
+             'source': f'{source}.com'}))
+        record = loads(record)
+        return jsonify(record)

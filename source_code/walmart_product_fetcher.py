@@ -1,11 +1,12 @@
+import requests
+from json import loads, dumps
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import get_conf, dictionary_repacker
-from pyTools.extra_tools import wait_for_dependencies, is_configuration_n_rabbit_up
-from json import loads, dumps
-import requests
+from pyTools.extra_tools import wait_for_dependencies
+from pyTools.extra_tools import is_configuration_n_rabbit_up
 
 
-# doesn't start the app until the config file 
+# doesn't start the app until the config file
 # and rabbit are both available.
 is_configuration_n_rabbit_up()
 

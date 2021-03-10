@@ -1,7 +1,8 @@
+from json import loads, dumps
 from pyTools.mongo import db_connect
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf, wait_for_dependencies, is_configuration_n_rabbit_up
-from json import loads, dumps
+from pyTools.extra_tools import get_conf, wait_for_dependencies
+from pyTools.extra_tools import is_configuration_n_rabbit_up
 
 
 # doesn't start the app until the config file
@@ -16,7 +17,7 @@ is_configuration_n_rabbit_up()
 # A list of dependencies.
 RABBIT_HOST = get_conf('rabbitmq', 'host')
 RABBIT_DB_READER_QUEUE = get_conf('rabbitmq', 'queues', 'db_reader_queue')
-MONGO_HOST = get_conf('mongodb', 'host')+":"+"27017"
+MONGO_HOST = get_conf('mongodb', 'host')+':27017'
 MONGO_DB = get_conf('mongodb', 'db')
 DEPENDS_ON = get_conf('db_reader', 'depends_on')
 
@@ -42,12 +43,15 @@ def read_from_db(msg):
 
     # Creating a full connection string to the DB.
     mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
-
-    # The DB is queried with the msg dictionary as a filter.
-    results = mongo_connection.find(msg_as_dict)
+    
+    try:
+        # The DB is queried with the msg dictionary as a filter.
+        result = mongo_connection.find_one(msg_as_dict)
+    except:
+        result = None
 
     # The results are returned in a list.
-    return dumps([x for x in results])
+    return dumps(result)
 
 
 # This function starts listening to the given rabbit queue,
