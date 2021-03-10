@@ -1,17 +1,29 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
+from pyTools.extra_tools import wait_for_dependencies, is_configuration_n_rabbit_up
 from pyTools.extra_tools import get_conf, dictionary_repacker
 from json import loads, dumps
 import requests
+
+
+# doesn't start the app until the config file
+# and rabbit are both available.
+is_configuration_n_rabbit_up()
+
 
 # The RabbitMQ host to connect to,
 # A queue to listen to,
 # An API to query,
 # A list of json keys to be replaced with normalized
 # keys used everywhere in this system.
-RABBIT_HOST = get_conf('RabbitMQ', 'host')
-RABBIT_AMAZON_QUEUE = get_conf('RabbitMQ', 'queues', 'amazon_queue')
-AMAZON_API = get_conf('Amazon', 'api')
-AMAZON_JSON_KEYS = get_conf('Amazon', 'keys')
+# A list of dependencies
+RABBIT_HOST = get_conf('rabbitmq', 'host')
+RABBIT_AMAZON_QUEUE = get_conf('rabbitmq', 'queues', 'amazon_queue')
+AMAZON_API = get_conf('amazon', 'api')
+AMAZON_JSON_KEYS = get_conf('amazon', 'keys')
+DEPENDS_ON = get_conf('amazon', 'depends_on')
+
+# waiting for dependencies before starting service
+wait_for_dependencies(*DEPENDS_ON)
 
 
 # Initializing a rabbit object and declaring the queue it will consume from.

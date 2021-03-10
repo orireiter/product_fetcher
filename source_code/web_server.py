@@ -1,23 +1,29 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf
+from pyTools.extra_tools import get_conf, wait_for_dependencies, is_configuration_n_rabbit_up
 from flask import Flask, request, jsonify
 from json import loads, dumps
 import re
+
+# doesn't start the app until the config file
+# and rabbit are both available.
+is_configuration_n_rabbit_up()
 
 # The RabbitMQ host to connect to,
 # A queue to listen to,
 # An API to query,
 # A list of json keys to be replaced with normalized
-# keys used everywhere in this system.
-RABBIT_HOST = get_conf('RabbitMQ', 'host')
-RABBIT_AMAZON_QUEUE = get_conf('RabbitMQ', 'queues', 'amazon_queue')
-RABBIT_WALMART_QUEUE = get_conf('RabbitMQ', 'queues', 'walmart_queue')
-RABBIT_DB_READER_QUEUE = get_conf('RabbitMQ', 'queues', 'db_reader_queue')
-RABBIT_DB_WRITER_QUEUE = get_conf('RabbitMQ', 'queues', 'db_writer_queue')
+# keys used everywhere in this system,
+# A list of dependencies.
+RABBIT_HOST = get_conf('rabbitmq', 'host')
+RABBIT_AMAZON_QUEUE = get_conf('rabbitmq', 'queues', 'amazon_queue')
+RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
+RABBIT_DB_READER_QUEUE = get_conf('rabbitmq', 'queues', 'db_reader_queue')
+RABBIT_DB_WRITER_QUEUE = get_conf('rabbitmq', 'queues', 'db_writer_queue')
+
 
 # Initialize the flask server and rabbit object
 app = Flask(__name__)
-rabbit = Rabbit(get_conf('RabbitMQ', 'host'))
+rabbit = Rabbit(get_conf('rabbitmq', 'host'))
 
 
 # Declare the queues the the server is going to send messages to.
@@ -44,30 +50,26 @@ rabbit.declare_queue(RABBIT_DB_WRITER_QUEUE, durable=True)
 @app.route('/<string:source>/<string:_id>', methods=['GET'])
 def get(source: str, _id: str):
     # making sure the right urls are queried.
-    if source != "amazon" and source != "walmart":
+    if source != 'amazon' and source != 'walmart':
         return("ERROR: source given must be either amazon or walmart."), 403
     # making sure the id contains only uppercase letter and numbers.
     elif not re.search(r'^[0-9A-Z]+$', str(_id)):
-        return("ERROR: product ID given can contain only uppercase letters and numbers."), 403
+        return('ERROR: product ID given can contain only uppercase letters and numbers.'), 403
     else:
         record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
-            {"_id": _id, "source": f"{source}.com"}))
-        if record == "[]":
+            {'_id': _id, 'source': f'{source}.com'}))
+        if record == '[]':
             result = rabbit.send_n_receive(
-                get_conf('RabbitMQ', 'queues', f'{source}_queue'), _id)
+                get_conf('rabbitmq', 'queues', f'{source}_queue'), _id)
 
-            if result == ("None"):
-                return f"No product found for ID:{_id} in source:{source}", 404
+            if result == ('None'):
+                return f'No product found for ID:{_id} in source:{source}', 404
 
             else:
-                #print(result)
+                # print(result)
                 result = loads(result)
                 result['source'] = result['source'].lower()
                 rabbit.send_one(RABBIT_DB_WRITER_QUEUE, dumps(result))
                 return jsonify(result)
         else:
-            print(record)
             return jsonify(loads(record))
-
-
-app.run()

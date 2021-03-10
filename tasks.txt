@@ -39,4 +39,6 @@
 
 * ensure consistency of jsons ( from web its dict and db its a dict in a list )
 
-* consistency of qoutes and global imports first
+* consistency of qoutes and global imports first.
+
+* block DOS ?

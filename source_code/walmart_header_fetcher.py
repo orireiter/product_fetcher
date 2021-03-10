@@ -6,8 +6,8 @@ import requests
 
 # An API to query for walmart headers.
 # A path to a json file containing headers to add to an api request.
-WALMART_HEADERS_API = get_conf('Walmart', 'headers_api')
-WALMART_HEADERS_JSON_PATH = get_conf('Walmart', 'headers_json')
+WALMART_HEADERS_API = get_conf('walmart', 'headers_api')
+WALMART_HEADERS_JSON_PATH = get_conf('walmart', 'headers_json')
 
 
 # This function queries an API that retrieves headers_api

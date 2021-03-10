@@ -1,0 +1,25 @@
+{
+    "listeners": {
+        "*:80": {
+            "pass": "applications/flask_app"
+        }
+    },
+
+    "applications": {
+        "flask_app": {
+            "type": "python 3",
+            "user": "root",
+            "group": "root",
+            "working_directory": "/app/",
+            "path": "/app/",
+            "home": "/app/venv/",
+            "module": "web_server",
+            "callable": "app",
+            "processes": {
+                "max": 20,
+                "spare": 5,
+                "idle_timeout": 30
+            }
+        }
+    }
+}

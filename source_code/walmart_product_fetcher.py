@@ -1,7 +1,13 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import get_conf, dictionary_repacker
+from pyTools.extra_tools import wait_for_dependencies, is_configuration_n_rabbit_up
 from json import loads, dumps
 import requests
+
+
+# doesn't start the app until the config file 
+# and rabbit are both available.
+is_configuration_n_rabbit_up()
 
 
 # The RabbitMQ host to connect to,
@@ -9,12 +15,17 @@ import requests
 # An API to query.
 # A json file containing headers required,
 # A list of json keys to be replaced with normalized
-# keys used everywhere in this system.
-RABBIT_HOST = get_conf('RabbitMQ', 'host')
-RABBIT_WALMART_QUEUE = get_conf('RabbitMQ', 'queues', 'walmart_queue')
-WALMART_API = get_conf("Walmart", "api")
-WALMART_HEADERS_JSON = get_conf("Walmart", "headers_json")
-WALMART_JSON_KEYS = get_conf("Walmart", "keys")
+# keys used everywhere in this system,
+# A list of dependencies.
+RABBIT_HOST = get_conf('rabbitmq', 'host')
+RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
+WALMART_API = get_conf('walmart', 'api')
+WALMART_HEADERS_JSON = get_conf('walmart', 'headers_json')
+WALMART_JSON_KEYS = get_conf('walmart', 'keys')
+DEPENDS_ON = get_conf('walmart', 'depends_on')
+
+# waiting for dependencies before starting service
+wait_for_dependencies(*DEPENDS_ON)
 
 
 # After initializing a rabbit object and declare the queue it will consume from.
@@ -27,7 +38,7 @@ wlmrt_fetcher.declare_queue(RABBIT_WALMART_QUEUE, durable=True)
 # info about a product from walmart.
 def fetch_walmart_prdct(msg):
     # First the json containing headers is loaded.
-    with open(WALMART_HEADERS_JSON, "r") as file:
+    with open(WALMART_HEADERS_JSON, 'r') as file:
         walmart_headers = loads(file.read())
 
     # The API is queried, along with the headers.

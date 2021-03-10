@@ -1,0 +1,82 @@
+version: "3.8"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    networks:
+      - yaballe_API
+    deploy:
+      replicas: 1
+    ports:
+      - 15672:15672
+    container_name: rabbitmq
+
+  mongodb:
+    image: mongo
+    deploy:
+      replicas: 1
+    container_name: mongodb
+    networks:
+      - yaballe_API
+
+  amazon_fetcher:
+    image: amazon_fetcher:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+
+  walmart_fetcher:
+    image: walmart_fetcher:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./walmart_headers.json:/app/walmart_headers.json
+
+  walmart_header_fetcher:
+    image: walmart_header_fetcher:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./walmart_headers.json:/app/walmart_headers.json
+
+  web_api:
+    image: web_server:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./config.json:/docker-entrypoint.d/config.json
+    ports:
+      - 80:80
+
+  db_reader:
+    image: db_reader:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+
+  db_writer:
+    image: db_writer:0.0.1
+    deploy:
+      replicas: 1
+    networks:
+      - yaballe_API
+    volumes:
+      - ./config.yml:/app/config.yml
+
+networks:
+  yaballe_API:
+    driver: bridge
