@@ -1,6 +1,6 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import get_conf, dictionary_repacker
-from json import loads
+from json import loads, dumps
 import requests
 
 # The RabbitMQ host to connect to,
@@ -23,11 +23,9 @@ amazon_fetcher.declare_queue(RABBIT_AMAZON_QUEUE, durable=True)
 # It will use the ID in the msg to try and fetch
 # info about a product from amazon.
 def fetch_amazon_product(msg):
-    # First, the message is decoded to string
-    msg_as_str = msg.decode('utf-8')
 
     try:
-        product = requests.get(AMAZON_API+msg_as_str)
+        product = requests.get(AMAZON_API+msg)
     except requests.exceptions.ConnectionError:
         return "ERROR: Couldn't connect to amazon API"
 
@@ -38,7 +36,7 @@ def fetch_amazon_product(msg):
         full_product_dict = loads(product.text)['data']
         relevant_product_dict = dictionary_repacker(
             full_product_dict, AMAZON_JSON_KEYS)
-        return relevant_product_dict
+        return dumps(relevant_product_dict)
     else:
         return None
 

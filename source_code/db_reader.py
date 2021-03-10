@@ -1,7 +1,7 @@
 from pyTools.mongo import db_connect
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf, fix_json_quotings
-from json import loads
+from pyTools.extra_tools import get_conf
+from json import loads, dumps
 
 
 # The RabbitMQ host to connect to,
@@ -13,6 +13,7 @@ RABBIT_DB_READER_QUEUE = get_conf('RabbitMQ', 'queues', 'db_reader_queue')
 MONGO_HOST = get_conf('MongoDB', 'host')+":"+"27017"
 MONGO_DB = get_conf('MongoDB', 'db')
 
+
 # Initializing a rabbit object and declaring the queue it will consume from.
 db_reader = Rabbit(host=RABBIT_HOST)
 db_reader.declare_queue(RABBIT_DB_READER_QUEUE, durable=True)
@@ -21,12 +22,9 @@ db_reader.declare_queue(RABBIT_DB_READER_QUEUE, durable=True)
 # The function that will be executed when a message is consumed.
 # It will turn the message into a dictionary and query the DB with it.
 def read_from_db(msg):
-    # First, the message is decoded to string.
-    # Then, since RabbitMQ messes with the qoutings
-    # They're replaced as to not interrupt with
-    # converting the string to a dict.
-    msg_as_str = msg.decode('utf-8')
-    msg_as_dict = fix_json_quotings(msg_as_str)
+    # First, the message is loaded to a dict.
+    msg_as_dict = loads(msg)
+    
 
     # Assigning the collection according to the source of the product.
     # This is not a constant because this function will serve multiple
@@ -40,7 +38,7 @@ def read_from_db(msg):
     results = mongo_connection.find(msg_as_dict)
 
     # The results are returned in a list.
-    return [x for x in results]
+    return dumps([x for x in results])
 
 
 # This function starts listening to the given rabbit queue,

@@ -1,8 +1,8 @@
 RabbitMQ:
   host: localhost
   queues:
-    amazon_queue: amzn
-    walmart_queue: wlmrt
+    amazon_queue: amazon
+    walmart_queue: walmart
     db_writer_queue: db_write
     db_reader_queue: db_read
 
@@ -10,8 +10,8 @@ MongoDB:
   host: localhost
   db: products
   collections:
-    amazon: amazon
-    walmart: walmart
+    amazon.com: amazon
+    walmart.com: walmart
 
 Amazon:
   api: https://ebazon-prod.herokuapp.com/ybl_assignment/amazon/

@@ -4,27 +4,27 @@ import yaml
 # extra tools that can be useful in any project #
 
 
-'''
-    a function that parses a yml and returns a value
-    corresponding to the key/keychain supplied
-    example for execution: 
-
- admin_cred = get_Conf(['DBs','products','db_cred'])
- will return admin mysql cred to access the db named products
- in a .yml that looks like this
- DBs:
-    products:
-        db_cred:
-        host: localhost
-        user: ori
-        password: 123456
-        tables:
-        - music
-        - movies
-'''
-
-
 def get_conf(*key_list):
+    '''
+        a function that parses a yml and returns a value
+        corresponding to the key/keychain supplied
+        example for execution: 
+
+        admin_cred = get_Conf('DBs','products','db_cred')\n
+        will return admin mysql cred to access the db named products\n
+        in a .yml that looks like this\n
+        DBs:\n
+            products:\n
+                db_cred:\n
+                    host: localhost\n
+                    user: ori\n
+                    password: 123456\n
+                tables:\n
+                - music\n
+                - movies\n
+    '''
+
+    
     conf = yaml.safe_load(open('./config.yml'))
     try:
         for key in list(key_list):
@@ -32,12 +32,6 @@ def get_conf(*key_list):
     except KeyError:
         return "ERROR: one of the keys given does NOT exist"
     return conf
-
-
-def fix_json_quotings(string):
-    fixed_string = string.replace("'", '"')
-    fixed_json = loads(fixed_string)
-    return(fixed_json)
 
 
 def dictionary_repacker(dictionary: dict,

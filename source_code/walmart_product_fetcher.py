@@ -1,6 +1,6 @@
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import get_conf, dictionary_repacker
-from json import loads
+from json import loads, dumps
 import requests
 
 
@@ -30,12 +30,9 @@ def fetch_walmart_prdct(msg):
     with open(WALMART_HEADERS_JSON, "r") as file:
         walmart_headers = loads(file.read())
 
-    # Second, the message is decoded to string
-    msg_as_str = msg.decode('utf-8')
-
     # The API is queried, along with the headers.
     try:
-        product = requests.get(WALMART_API + msg_as_str,
+        product = requests.get(WALMART_API + msg,
                                headers=walmart_headers)
     except requests.exceptions.ConnectionError:
         return "ERROR: Couldn't connect to amazon API"
@@ -48,7 +45,7 @@ def fetch_walmart_prdct(msg):
         relevant_product_dict = dictionary_repacker(
             full_product_dict, WALMART_JSON_KEYS)
 
-        return relevant_product_dict
+        return dumps(relevant_product_dict)
 
     else:
         return None

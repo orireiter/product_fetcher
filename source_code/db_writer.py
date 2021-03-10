@@ -1,6 +1,6 @@
 from pyTools.mongo import db_connect
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf, fix_json_quotings
+from pyTools.extra_tools import get_conf
 from json import loads
 
 
@@ -22,13 +22,12 @@ db_writer.declare_queue(RABBIT_DB_WRITER_QUEUE, durable=True)
 # The function that will be executed when a message is consumed.
 # It will turn the message into a dictionary and insert it to the DB.
 def write_to_db(msg):
-    # First, the message is decoded to string.
-    # Then, since RabbitMQ messes with the qoutings
-    # They're replaced as to not interrupt with
-    # converting the string to a dict.
-    msg_as_str = msg.decode('utf-8')
-    msg_as_dict = fix_json_quotings(msg_as_str)
-    
+    # First, the message is loaded to a dict.
+    msg_as_dict = loads(msg)
+
+    # ensuring all IDs are strings ( to avoid errors and normalize IDs )
+    msg_as_dict["_id"] = str(msg_as_dict["_id"])
+
     # Assigning the collection according to the source of the product.
     # This is not a constant because this function will serve multiple
     # collections.
@@ -36,10 +35,12 @@ def write_to_db(msg):
 
     # Creating a full connection string to the DB.
     mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
-
-    # The dictionary is inserted into the collection.
-    mongo_connection.insert_one(msg_as_dict)
-
+    try:
+        # The dictionary is inserted into the collection.
+        mongo_connection.insert_one(msg_as_dict)
+    except:
+        pass
+        # should think how to fix this.
 
 # This function starts listening to the given rabbit queue,
 # and executes the function above upon message consumption, with

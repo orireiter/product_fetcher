@@ -326,12 +326,17 @@ class Rabbit:
 
         while self.response == None:
             self.connection.process_data_events()
-        return str(self.response)
+        return self.response.decode('utf-8')
 
     def receive_n_send_one(self, queue_name: str, func):
         '''
-              Receives a message, executes a function with it and returns an answer.
-              It then stops consuming.
+              Receives a message, executes a function with it and 
+              returns an answer.
+              It then stops consuming.\n
+              TO AVOID ERRORS, make sure the callback function 
+              returns a correct string.\n
+              ie if it's a dictionary - use json.dumps() and not str() and so on.
+
 
               Parameters
               ----------
@@ -356,7 +361,7 @@ class Rabbit:
 
         def callback(ch, method, properties, body):
             try:
-                result = func(body)
+                result = func(body.decode('utf-8'))
             except:
                 print(
                     f"ERROR: Couldn't execute the function named {func.__name__} on the given message")
@@ -378,7 +383,10 @@ class Rabbit:
         '''
               Receives a message, executes a function with it and returns an answer.
               Can consume endless messages.
-              Check send_n_receive for more info.
+              Check send_n_receive for more info.\n
+              TO AVOID ERRORS, make sure the callback function 
+              returns a correct string.\n
+              ie if it's a dictionary - use json.dumps() and not str() and so on.
 
               Parameters
               ----------
@@ -403,7 +411,7 @@ class Rabbit:
 
         def callback(ch, method, properties, body):
             try:
-                result = func(body)
+                result = func(body.decode('utf-8'))
             except:
                 print(
                     f"ERROR: Couldn't execute the function named {func.__name__} on the given message")
@@ -448,7 +456,7 @@ class Rabbit:
 
         def callback(ch, method, properties, body):
             try:
-                result = func(body)
+                result = func(body.decode('utf-8'))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             except:
                 print(
@@ -487,7 +495,7 @@ class Rabbit:
 
         def callback(ch, method, properties, body):
             try:
-                result = func(body)
+                result = func(body.decode('utf-8'))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             except:
                 print(

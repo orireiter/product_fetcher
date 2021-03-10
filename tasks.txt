@@ -2,7 +2,8 @@
     - should put emphasis
 
 * Choose a DB. ( SQL or NoSQL )
-    - chose mongodb
+    - chose mongodb.
+    - use TTL for records.
 
 * Use config file(s) or ENV var(s).
     - using shared yml
@@ -15,10 +16,11 @@
 
 * Write a service to fetch data from walmart (!!!mind the headers' TTL!!!).
     - wrote basic version. exceptions and efficiency need to be considered.
+    - maybe use pickle instead of json to store headers. use contstants on the stringify dump
 
 * Write a service to GET data from the DB.
     - wrote basic version. exceptions and efficiency need to be considered.
-    - use fix json quotings function.
+    - how to act when database is unavailable?
     
 * Write a service to INSERT data to the DB.
     - wrote basic version. exceptions and efficiency need to be considered.
@@ -29,4 +31,12 @@
 
 * Write tests!!!
 
+* maybe add decorator for decoding messages.
+
 * Containerize and keep dockerfile(s) / docker-compose.yml(s).
+ 
+* rabbitmq should i use exchanges?
+
+* ensure consistency of jsons ( from web its dict and db its a dict in a list )
+
+* consistency of qoutes and global imports first
