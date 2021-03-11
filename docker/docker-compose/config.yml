@@ -6,6 +6,8 @@ rabbitmq:
     db_writer_queue: db_write
     db_reader_queue: db_read_by_id
     db_filter_queue: db_read_by_filter
+  exchanges:
+    fetcher_writer_exchange: response
 
 mongodb:
   host: mongodb

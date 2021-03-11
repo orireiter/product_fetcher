@@ -19,9 +19,10 @@ services:
       - 27017:27017
     networks:
       - yaballe_API
-
+    command: --quiet
+    
   amazon_fetcher:
-    image: amazon_fetcher:0.0.2
+    image: amazon_fetcher:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -30,7 +31,7 @@ services:
       - ./config.yml:/app/config.yml
 
   walmart_fetcher:
-    image: walmart_fetcher:0.0.2
+    image: walmart_fetcher:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -40,7 +41,7 @@ services:
       - ./walmart_headers.json:/app/walmart_headers.json
 
   walmart_header_fetcher:
-    image: walmart_header_fetcher:0.0.2
+    image: walmart_header_fetcher:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -50,7 +51,7 @@ services:
       - ./walmart_headers.json:/app/walmart_headers.json
 
   web_server:
-    image: web_server:0.0.2
+    image: web_server:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -62,7 +63,7 @@ services:
       - 80:80
 
   db_reader_by_id:
-    image: db_reader_by_id:0.0.2
+    image: db_reader_by_id:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -70,9 +71,8 @@ services:
     volumes:
       - ./config.yml:/app/config.yml
 
-  
   db_reader_by_filter:
-    image: db_reader_by_filter:0.0.2
+    image: db_reader_by_filter:0.0.5
     deploy:
       replicas: 1
     networks:
@@ -81,7 +81,7 @@ services:
       - ./config.yml:/app/config.yml
 
   db_writer:
-    image: db_writer:0.0.2
+    image: db_writer:0.0.5
     deploy:
       replicas: 1
     networks:
