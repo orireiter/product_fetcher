@@ -17,6 +17,7 @@ is_configuration_n_rabbit_up()
 # A list of dependencies.
 RABBIT_HOST = get_conf('rabbitmq', 'host')
 RABBIT_DB_WRITER_QUEUE = get_conf('rabbitmq', 'queues', 'db_writer_queue')
+RABBIT_RESPONSE_EXCHANGE = get_conf('rabbitmq', 'exchanges', 'fetcher_writer_exchange')
 MONGO_HOST = get_conf('mongodb', 'host')+':27017'
 MONGO_DB = get_conf('mongodb', 'db')
 DEPENDS_ON = get_conf('db_writer', 'depends_on')
@@ -29,13 +30,24 @@ wait_for_dependencies(*DEPENDS_ON)
 db_writer = Rabbit(host=RABBIT_HOST)
 db_writer.declare_queue(RABBIT_DB_WRITER_QUEUE, durable=True)
 
+# Declaring an exchange which will include writer, amazon + walmart fetcher.
+# So that each message will return both to the client, 
+# and also be written to the db.
+db_writer.declare_exchange(RABBIT_RESPONSE_EXCHANGE, 'topic')
+db_writer.channel.queue_bind(RABBIT_DB_WRITER_QUEUE, RABBIT_RESPONSE_EXCHANGE, '#')
 
 # The function that will be executed when a message is consumed.
 # It will turn the message into a dictionary and insert it to the DB.
 def write_to_db(msg):
     # First, the message is loaded to a dict.
     msg_as_dict = loads(msg)
-
+    
+    # since every message that went to walmart/amazon
+    # also goes here, this is to ensure when they return the an
+    # id doesn't exist, it's not written to the db or crashes
+    # this consumer.
+    if msg_as_dict == None:
+        return None
     # ensuring all IDs are strings ( to avoid errors and normalize IDs )
     msg_as_dict['_id'] = str(msg_as_dict['_id'])
 

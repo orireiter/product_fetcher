@@ -1,1 +1,1 @@
-docker build -t web_server:0.0.2 -f .\docker\web_server\Dockerfile .
+docker build -t web_server:0.0.5 -f .\docker\web_server\Dockerfile .

@@ -379,7 +379,7 @@ class Rabbit:
             queue=queue_name, on_message_callback=callback)
         self.channel.start_consuming()
 
-    def receive_n_send_many(self, queue_name: str, func):
+    def receive_n_send_many(self, queue_name: str, func, reply_to_exchange: str=''):
         '''
               Receives a message, executes a function with it and returns an answer.
               Can consume endless messages.
@@ -417,7 +417,7 @@ class Rabbit:
                     f"ERROR: Couldn't execute the function named {func.__name__} on the given message")
                 return f"ERROR: Couldn't execute the function named {func.__name__} on the given message"
 
-            ch.basic_publish(exchange='',
+            ch.basic_publish(exchange=reply_to_exchange,
                              routing_key=properties.reply_to,
                              properties=pika.BasicProperties(
                                  correlation_id=properties.correlation_id),
@@ -503,6 +503,68 @@ class Rabbit:
                 return f"ERROR: Couldn't execute the function named {func.__name__} on the given message"
             return result
 
+        self.channel.basic_consume(
+            queue=queue_name, on_message_callback=callback)
+        self.channel.start_consuming()
+
+    def receive_n_redirect_many(self, queue_name: str, func, reply_to_exchange: str=''):
+        '''
+              Receives a message, executes a function with it and returns an answer.
+              it can optionally redirect the message elsewhere and not return it.
+              This will happen when the function that was callbacked will return
+              a dictionary containing a key 'redirect_to' with the value 
+              of the queue to be redirected to, and a key 'exchange' with
+              the value of the exchange of said queue.
+              Can consume endless messages.
+              Check send_n_receive for more info.\n
+              TO AVOID ERRORS, make sure the callback function 
+              returns a correct string.\n
+              ie if it's a dictionary - use json.dumps() and not str() and so on.
+
+              Parameters
+              ----------
+              queue_name: str
+                    Queue name to receive messages from.
+              func: function
+                    The function that will use the message.
+
+              Raises
+              ------
+              Checks if the queue exists.
+              If it doesn't exist, an exception will be returned.
+              Tries to execute the function.
+              If it can't, an exception will be returned.
+        '''
+
+        # first check if queue exists
+        try:
+            self.declare_queue(queue_name, True)
+        except:
+            return(f'ERROR: Queue named {queue_name} not found. \n       Consider declaring it first.')
+
+        def callback(ch, method, properties, body):
+            try:
+                result = func(body.decode('utf-8'))
+            except:
+                print(
+                    f"ERROR: Couldn't execute the function named {func.__name__} on the given message")
+                return f"ERROR: Couldn't execute the function named {func.__name__} on the given message"
+
+            if type(result) == type({}) and 'redirect_to' in result and 'exchange' in result:
+                ch.basic_publish(exchange=result['exchange'],
+                                 routing_key=result['redirect_to'],
+                                 properties=pika.BasicProperties(
+                                     correlation_id=properties.correlation_id,
+                                     reply_to=properties.reply_to),
+                                 body=body.decode('utf-8'))
+            else:
+                ch.basic_publish(exchange=reply_to_exchange,
+                                 routing_key=properties.reply_to,
+                                 properties=pika.BasicProperties(
+                                     correlation_id=properties.correlation_id),
+                                 body=str(result))
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            return result
         self.channel.basic_consume(
             queue=queue_name, on_message_callback=callback)
         self.channel.start_consuming()

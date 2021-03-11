@@ -1,1 +1,1 @@
-docker build -t walmart_header_fetcher:0.0.2 -f .\docker\walmart_header_fetcher\Dockerfile .
+docker build -t walmart_header_fetcher:0.0.5 -f .\docker\walmart_header_fetcher\Dockerfile .

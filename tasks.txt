@@ -1,32 +1,36 @@
 * Write tests!!!
     - should put emphasis
 
+* document and readme...
+
+* need to handle status codes other than 200 better. and not only say that product doesnt exist.
+
 * Choose a DB. ( SQL or NoSQL )
-    - chose mongodb.
+    $ chose mongodb.
     - use TTL for records.
 
-* Use config file(s) or ENV var(s).
-    - using shared yml
+$ Use config file(s) or ENV var(s).
+    $ using shared yml
 
 * Write a service to fetch data from amazon.
     - wrote basic version. exceptions and efficiency need to be considered.
-    - maybe use regex to confirm id.
-    - put api urls in config instead of constants.
-    - instead of manually building a dict, make a function from it to unpack stuff.
+    $ maybe use regex to confirm id.
+    $ put api urls in config instead of constants.
+    $ instead of manually building a dict, make a function from it to unpack stuff.
 
 * Write a service to fetch data from walmart (!!!mind the headers' TTL!!!).
     - wrote basic version. exceptions and efficiency need to be considered.
-    - maybe use pickle instead of json to store headers. use contstants on the stringify dump
+    X maybe use pickle instead of json to store headers. use contstants on the stringify dump
 
 * Write a service to GET data from the DB.
-    - wrote basic version. exceptions and efficiency need to be considered.
+    $ wrote basic version. exceptions and efficiency need to be considered.
     - how to act when database is unavailable? WRITE_AHEAD_LOG
     
-* Write a service to INSERT data to the DB.
-    - wrote basic version. exceptions and efficiency need to be considered.
+$ Write a service to INSERT data to the DB.
+    $ wrote basic version. exceptions and efficiency need to be considered.
     
-* Write an API that will insert the clients' request(s) into the system.
-    - wrote basic version
+$ Write an API that will insert the clients' request(s) into the system.
+    $ wrote basic version
     
 * Mind the efficiency ( async, concurrent, design patterns).
 
@@ -36,7 +40,7 @@ $ maybe add decorator for decoding messages.
 
 $ Containerize and keep dockerfile(s) / docker-compose.yml(s).
  
-* rabbitmq should i use exchanges?
+$ rabbitmq should i use exchanges?
 
 $ ensure consistency of jsons ( from web its dict and db its a dict in a list )
 

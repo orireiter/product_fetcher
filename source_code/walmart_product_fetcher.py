@@ -23,6 +23,7 @@ RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
 WALMART_API = get_conf('walmart', 'api')
 WALMART_HEADERS_JSON = get_conf('walmart', 'headers_json')
 WALMART_JSON_KEYS = get_conf('walmart', 'keys')
+RABBIT_RESPONSE_EXCHANGE = get_conf('rabbitmq', 'exchanges', 'fetcher_writer_exchange')
 DEPENDS_ON = get_conf('walmart', 'depends_on')
 
 # waiting for dependencies before starting service
@@ -42,6 +43,8 @@ def fetch_walmart_prdct(msg):
     with open(WALMART_HEADERS_JSON, 'r') as file:
         walmart_headers = loads(file.read())
 
+    # only the id value is needed to query the remote api
+    msg = loads(msg)['_id']
     # The API is queried, along with the headers.
     try:
         product = requests.get(WALMART_API + msg,
@@ -56,11 +59,14 @@ def fetch_walmart_prdct(msg):
         full_product_dict = loads(product.text)
         relevant_product_dict = dictionary_repacker(
             full_product_dict, WALMART_JSON_KEYS)
-
+        
+        # certain values are normalized before writing to db.
+        relevant_product_dict['source'] = relevant_product_dict['source'].lower()
+        relevant_product_dict['_id'] = str(relevant_product_dict['_id'])
         return dumps(relevant_product_dict)
 
     else:
-        return None
+        return dumps(None)
 
 
 # This function starts listening to the given rabbit queue,
@@ -68,4 +74,4 @@ def fetch_walmart_prdct(msg):
 # the message as a parameter.
 # The return of the callback function is sent back to RabbitMQ.
 # For more information check the class docstrings.
-wlmrt_fetcher.receive_n_send_many(RABBIT_WALMART_QUEUE, fetch_walmart_prdct)
+wlmrt_fetcher.receive_n_send_many(RABBIT_WALMART_QUEUE, fetch_walmart_prdct, RABBIT_RESPONSE_EXCHANGE)

@@ -18,6 +18,7 @@ is_configuration_n_rabbit_up()
 # A list of dependencies
 RABBIT_HOST = get_conf('rabbitmq', 'host')
 RABBIT_AMAZON_QUEUE = get_conf('rabbitmq', 'queues', 'amazon_queue')
+RABBIT_RESPONSE_EXCHANGE = get_conf('rabbitmq', 'exchanges', 'fetcher_writer_exchange')
 AMAZON_API = get_conf('amazon', 'api')
 AMAZON_JSON_KEYS = get_conf('amazon', 'keys')
 DEPENDS_ON = get_conf('amazon', 'depends_on')
@@ -35,7 +36,8 @@ amazon_fetcher.declare_queue(RABBIT_AMAZON_QUEUE, durable=True)
 # It will use the ID in the msg to try and fetch
 # info about a product from amazon.
 def fetch_amazon_product(msg):
-
+    # only the id value is needed to query the remote db.
+    msg = loads(msg)['_id']
     try:
         product = requests.get(AMAZON_API+msg)
     except requests.exceptions.ConnectionError:
@@ -48,9 +50,13 @@ def fetch_amazon_product(msg):
         full_product_dict = loads(product.text)['data']
         relevant_product_dict = dictionary_repacker(
             full_product_dict, AMAZON_JSON_KEYS)
+            
+        # certain values are normalized before writing to db.
+        relevant_product_dict['source'] = relevant_product_dict['source'].lower()
+        relevant_product_dict['_id'] = str(relevant_product_dict['_id'])
         return dumps(relevant_product_dict)
     else:
-        return None
+        return dumps(None)
 
 
 # This function starts listening to the given rabbit queue,
@@ -58,4 +64,4 @@ def fetch_amazon_product(msg):
 # the message as a parameter.
 # The return of the callback function is sent back to RabbitMQ.
 # For more information check the class docstrings.
-amazon_fetcher.receive_n_send_many(RABBIT_AMAZON_QUEUE, fetch_amazon_product)
+amazon_fetcher.receive_n_send_many(RABBIT_AMAZON_QUEUE, fetch_amazon_product, RABBIT_RESPONSE_EXCHANGE)

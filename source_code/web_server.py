@@ -10,6 +10,7 @@ from pyTools.extra_tools import is_configuration_n_rabbit_up
 # and rabbit are both available.
 is_configuration_n_rabbit_up()
 
+
 # The RabbitMQ host to connect to,
 # A queue to listen to,
 # An API to query,
@@ -22,11 +23,21 @@ RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
 RABBIT_DB_READER_QUEUE = get_conf('rabbitmq', 'queues', 'db_reader_queue')
 RABBIT_DB_WRITER_QUEUE = get_conf('rabbitmq', 'queues', 'db_writer_queue')
 RABBIT_DB_FILTER_QUEUE = get_conf('rabbitmq', 'queues', 'db_filter_queue')
+RABBIT_RESPONSE_EXCHANGE = get_conf(
+    'rabbitmq', 'exchanges', 'fetcher_writer_exchange')
 
 
 # Initialize the flask server and rabbit object
 app = Flask(__name__)
 rabbit = Rabbit(get_conf('rabbitmq', 'host'))
+
+
+# Declaring an exchange which will include writer, amazon + walmart fetcher.
+# So that each message will return both to the client,
+# and also be written to the db.
+rabbit.declare_exchange(RABBIT_RESPONSE_EXCHANGE, 'topic')
+rabbit.channel.queue_bind(rabbit.callback_queue,
+                          RABBIT_RESPONSE_EXCHANGE, rabbit.callback_queue)
 
 
 # Declare the queues the the server is going to send messages to.
@@ -59,23 +70,13 @@ def fetch_by_id(source: str, _id: str):
     elif not re.search(r'^[0-9A-Z]+$', str(_id)):
         return('ERROR: product ID given can contain only uppercase letters and numbers.'), 403
     else:
+        # querying the db and if nothing there querying the web.
         record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
             {'_id': _id, 'source': f'{source}.com'}))
         record = loads(record)
+
         if record == None:
-            result = rabbit.send_n_receive(
-                get_conf('rabbitmq', 'queues', f'{source}_queue'), _id)
-
-            if result == ('None'):
-                return f'No product found for ID:{_id} in source:{source}', 404
-
-            else:
-                # print(result)
-                result = loads(result)
-                result['source'] = result['source'].lower()
-                result['_id'] = str(result['_id'])
-                rabbit.send_one(RABBIT_DB_WRITER_QUEUE, dumps(result))
-                return jsonify(result)
+            return f'No product found for ID:{_id} in source:{source}', 404
         else:
             return jsonify(record)
 
@@ -89,12 +90,14 @@ def filter_by_price(source: str):
     # making sure the right urls are queried.
     if source != 'amazon' and source != 'walmart':
         return('ERROR: source given must be either amazon or walmart.'), 403
-    # making sure the id contains only uppercase letter and numbers.
+    # making sure the params contain only numbers 
+    # (since they're to check price).
     elif not re.search(r'^[0-9]+$', str(greater_than_or_equal)):
         return('ERROR: price values can contain only numbers.'), 403
     elif not re.search(r'^[0-9]+$', str(lesser_than_or_equal)):
         return('ERROR: price values can contain only numbers.'), 403
     else:
+        # querying the db and returning the response.
         record = rabbit.send_n_receive(RABBIT_DB_FILTER_QUEUE, dumps(
             {'$gte': int(greater_than_or_equal),
              '$lte': int(lesser_than_or_equal),
