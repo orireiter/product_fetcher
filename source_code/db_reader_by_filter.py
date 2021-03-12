@@ -49,7 +49,7 @@ def filter_from_db(msg):
     try:
         # The DB is queried with the msg dictionary as a filter.
         results = mongo_connection.find(
-            {'price': msg_as_dict})
+            {'price': msg_as_dict}, projection={'ttl': False})
     except:
         results = None
 

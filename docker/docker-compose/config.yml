@@ -15,6 +15,7 @@ mongodb:
   collections:
     amazon.com: amazon
     walmart.com: walmart
+  ttl: 86400
 
 amazon:
   api: https://ebazon-prod.herokuapp.com/ybl_assignment/amazon/
@@ -31,6 +32,7 @@ walmart:
   api: https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items/
   headers_api: https://ebazon-prod.herokuapp.com/ybl_assignment/walmart/headers
   headers_json: ./walmart_headers.json
+  headers_fetch_interval: 60
   depends_on:
     - - rabbitmq
       - 5672
@@ -66,7 +68,6 @@ db_writer:
       - 27017
 
 web_server:
-  db_read:
   depends_on:
     - - rabbitmq
       - 5672

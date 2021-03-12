@@ -1,0 +1,2 @@
+* mongo ttl won't work accurately due to the container's wrong utc.
+* need to stop sending null messages to writer when there's no such ID, only to client.

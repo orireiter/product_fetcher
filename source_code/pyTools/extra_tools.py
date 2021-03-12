@@ -36,7 +36,7 @@ def get_conf(*key_list):
         raise Exception('ERROR: one of the keys given does NOT exist')
 
 
-def dictionary_repacker(dictionary: dict,
+def dictionary_key_repacker(dictionary: dict,
                         originialKey_n_wantedKey_list: list):
     '''
         This function takes a dictionary and repacks it with new keys.
@@ -46,7 +46,7 @@ def dictionary_repacker(dictionary: dict,
         \n
         before_dictionary = {'name': 'ori', 'age': 21, 'address': 'tlv'}\n
         renew_keys = [['name', 'full_name'], ['age']]\n
-        print(dictionary_repacker(before_dictionary, renew_keys))\n
+        print(dictionary_key_repacker(before_dictionary, renew_keys))\n
         -> {'full_name': 'ori', 'age': 21}
     '''
     return {key[-1]: dictionary[key[0]]

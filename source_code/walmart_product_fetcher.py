@@ -1,7 +1,7 @@
 import requests
 from json import loads, dumps
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-from pyTools.extra_tools import get_conf, dictionary_repacker
+from pyTools.extra_tools import get_conf, dictionary_key_repacker
 from pyTools.extra_tools import wait_for_dependencies
 from pyTools.extra_tools import is_configuration_n_rabbit_up
 
@@ -57,7 +57,7 @@ def fetch_walmart_prdct(msg):
     # is unpacked and is sent back to Rabbit.
     if product.status_code == 200:
         full_product_dict = loads(product.text)
-        relevant_product_dict = dictionary_repacker(
+        relevant_product_dict = dictionary_key_repacker(
             full_product_dict, WALMART_JSON_KEYS)
         
         # certain values are normalized before writing to db.

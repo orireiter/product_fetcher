@@ -1,7 +1,5 @@
 import pytest
-from source_code.pyTools.extra_tools import get_conf
-from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
-
+import requests
 
 # POST_TESTS
 #========================================================#
@@ -14,16 +12,13 @@ from source_code.pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 
 
 @pytest.mark.parametrize('body,expected', [
-    ('4837473', 'None')
+    ('4837473', 200),
+    ('ASFSVVV', 404),
+    ('1!!?1', 403)
 ])
 def test_walmart_fetcher(body, expected):
 
-    rbt_conn = Rabbit(host=get_conf('rabbitmq', 'host'))
-    rbt_conn.declare_queue(
-        get_conf('rabbitmq', 'queues', 'walmart_queue'), durable=True)
-
-    result = rbt_conn.send_n_receive(
-        get_conf('rabbitmq', 'queues', 'walmart_queue'), body)
+    result = requests.get(f'http://localhost/fetch/walmart/{body}')
 
     # Validate response headers and body contents, e.g. status code.
-    assert result.replace('b', '').replace("'", '') == expected
+    assert result.status_code == expected

@@ -2,7 +2,7 @@ import requests
 from json import loads, dumps
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import wait_for_dependencies, is_configuration_n_rabbit_up
-from pyTools.extra_tools import get_conf, dictionary_repacker
+from pyTools.extra_tools import get_conf, dictionary_key_repacker
 
 
 # doesn't start the app until the config file
@@ -48,7 +48,7 @@ def fetch_amazon_product(msg):
     # is unpacked and is sent back to Rabbit.
     if product.status_code == 200:
         full_product_dict = loads(product.text)['data']
-        relevant_product_dict = dictionary_repacker(
+        relevant_product_dict = dictionary_key_repacker(
             full_product_dict, AMAZON_JSON_KEYS)
             
         # certain values are normalized before writing to db.

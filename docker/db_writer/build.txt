@@ -1,1 +1,1 @@
-docker build -t db_writer:0.0.5 -f .\docker\db_writer\Dockerfile .
+docker build -t db_writer:0.0.7 -f .\docker\db_writer\Dockerfile .

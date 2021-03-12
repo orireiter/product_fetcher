@@ -49,7 +49,7 @@ def read_from_db(msg):
 
     try:
         # The DB is queried with the msg dictionary as a filter.
-        result = mongo_connection.find_one(msg_as_dict)
+        result = mongo_connection.find_one(msg_as_dict, projection={'ttl': False})
     except:
         result = None
 

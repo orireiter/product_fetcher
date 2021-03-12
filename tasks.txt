@@ -1,13 +1,15 @@
 * Write tests!!!
     - should put emphasis
 
-* document and readme...
+$ document and readme...
+
+$ !!!check that remote repos work as well!!!
 
 * need to handle status codes other than 200 better. and not only say that product doesnt exist.
 
-* Choose a DB. ( SQL or NoSQL )
+$ Choose a DB. ( SQL or NoSQL )
     $ chose mongodb.
-    - use TTL for records.
+    $ use TTL for records.
 
 $ Use config file(s) or ENV var(s).
     $ using shared yml
@@ -34,7 +36,7 @@ $ Write an API that will insert the clients' request(s) into the system.
     
 * Mind the efficiency ( async, concurrent, design patterns).
 
-* Write tests!!!
+$ Write tests!!!
 
 $ maybe add decorator for decoding messages.
 
@@ -45,3 +47,9 @@ $ rabbitmq should i use exchanges?
 $ ensure consistency of jsons ( from web its dict and db its a dict in a list )
 
 * block DOS ?
+
+
+added persistent db
+added readme
+
+will add test

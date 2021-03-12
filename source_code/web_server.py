@@ -76,7 +76,9 @@ def fetch_by_id(source: str, _id: str):
         record = loads(record)
 
         if record == None:
-            return f'No product found for ID:{_id} in source:{source}', 404
+            return jsonify({
+                "error": "There are currently no listings for this product or could not fetch details about the product"
+            }), 404
         else:
             return jsonify(record)
 
@@ -90,7 +92,7 @@ def filter_by_price(source: str):
     # making sure the right urls are queried.
     if source != 'amazon' and source != 'walmart':
         return('ERROR: source given must be either amazon or walmart.'), 403
-    # making sure the params contain only numbers 
+    # making sure the params contain only numbers
     # (since they're to check price).
     elif not re.search(r'^[0-9]+$', str(greater_than_or_equal)):
         return('ERROR: price values can contain only numbers.'), 403

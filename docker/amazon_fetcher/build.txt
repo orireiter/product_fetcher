@@ -1,1 +1,1 @@
-docker build -t amazon_fetcher:0.0.5 -f .\docker\amazon_fetcher\Dockerfile .
+docker build -t amazon_fetcher:0.0.7 -f .\docker\amazon_fetcher\Dockerfile .
