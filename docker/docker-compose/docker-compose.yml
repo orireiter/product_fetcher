@@ -20,7 +20,7 @@ services:
     networks:
       - yaballe_API
     volumes:
-      - ./db:/data/db
+      - mongodata:/data/db
     command: --quiet
     
   amazon_fetcher:
@@ -94,3 +94,6 @@ services:
 networks:
   yaballe_API:
     driver: bridge
+
+volumes:
+  mongodata:
