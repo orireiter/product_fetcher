@@ -52,32 +52,33 @@ for collection in get_conf('mongodb', 'collections').values():
 # The function that will be executed when a message is consumed.
 # It will turn the message into a dictionary and insert it to the DB.
 def write_to_db(msg):
-    # First, the message is loaded to a dict.
-    msg_as_dict = loads(msg)
-
-    # since every message that went to walmart/amazon
-    # also goes here, this is to ensure when they return the an
-    # id doesn't exist, it's not written to the db or crashes
-    # this consumer.
-    if msg_as_dict == None:
-        return None
-    # ensuring all IDs are strings ( to avoid errors and normalize IDs )
-    # adding a ttl.
-    msg_as_dict['_id'] = str(msg_as_dict['_id'])
-    msg_as_dict['ttl'] = datetime.datetime.utcnow()
-
-    # Assigning the collection according to the source of the product.
-    # This is not a constant because this function will serve multiple
-    # collections.
-    collection = get_conf('mongodb', 'collections', msg_as_dict['source'])
-
-    # Creating a full connection string to the DB.
-    mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
     try:
+        # First, the message is loaded to a dict.
+        msg_as_dict = loads(msg)
+
+        # since every message that went to walmart/amazon
+        # also goes here, this is to ensure when they return the an
+        # id doesn't exist, it's not written to the db or crashes
+        # this consumer.
+        if msg_as_dict == None:
+            return None
+        # ensuring all IDs are strings ( to avoid errors and normalize IDs )
+        # adding a ttl.
+        msg_as_dict['_id'] = str(msg_as_dict['_id'])
+        msg_as_dict['ttl'] = datetime.datetime.utcnow()
+
+        # Assigning the collection according to the source of the product.
+        # This is not a constant because this function will serve multiple
+        # collections.
+        collection = get_conf('mongodb', 'collections', msg_as_dict['source'])
+
+        # Creating a full connection string to the DB.
+        mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
+        
         # The dictionary is inserted into the collection.
         mongo_connection.insert_one(msg_as_dict)
     except:
-        pass
+        print(f'{datetime.datetime.now()} -> Couldn\'t write {msg}')
         # should think how to fix this.
 
 

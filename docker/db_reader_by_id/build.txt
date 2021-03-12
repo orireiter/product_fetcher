@@ -1,1 +1,1 @@
-docker build -t db_reader_by_id:0.0.7 -f .\docker\db_reader_by_id\Dockerfile .
+docker build -t db_reader_by_id:0.0.8 -f .\docker\db_reader_by_id\Dockerfile .

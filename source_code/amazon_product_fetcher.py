@@ -36,10 +36,12 @@ amazon_fetcher.declare_queue(RABBIT_AMAZON_QUEUE, durable=True)
 # It will use the ID in the msg to try and fetch
 # info about a product from amazon.
 def fetch_amazon_product(msg):
+    
+    msg_as_dict  = loads(msg) 
     # only the id value is needed to query the remote db.
-    msg = loads(msg)['_id']
+    msg_id = msg_as_dict['_id']
     try:
-        product = requests.get(AMAZON_API+msg)
+        product = requests.get(AMAZON_API+msg_id)
     except requests.exceptions.ConnectionError:
         return "ERROR: Couldn't connect to amazon API"
 
@@ -52,7 +54,7 @@ def fetch_amazon_product(msg):
             full_product_dict, AMAZON_JSON_KEYS)
             
         # certain values are normalized before writing to db.
-        relevant_product_dict['source'] = relevant_product_dict['source'].lower()
+        relevant_product_dict['source'] = msg_as_dict['source']
         relevant_product_dict['_id'] = str(relevant_product_dict['_id'])
         return dumps(relevant_product_dict)
     else:

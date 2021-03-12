@@ -42,12 +42,13 @@ def fetch_walmart_prdct(msg):
     # First the json containing headers is loaded.
     with open(WALMART_HEADERS_JSON, 'r') as file:
         walmart_headers = loads(file.read())
-
+    
+    msg_as_dict = loads(msg)
     # only the id value is needed to query the remote api
-    msg = loads(msg)['_id']
+    msg_id = msg_as_dict['_id']
     # The API is queried, along with the headers.
     try:
-        product = requests.get(WALMART_API + msg,
+        product = requests.get(WALMART_API + msg_id,
                                headers=walmart_headers)
     except requests.exceptions.ConnectionError:
         return "ERROR: Couldn't connect to amazon API"
@@ -61,7 +62,7 @@ def fetch_walmart_prdct(msg):
             full_product_dict, WALMART_JSON_KEYS)
         
         # certain values are normalized before writing to db.
-        relevant_product_dict['source'] = relevant_product_dict['source'].lower()
+        relevant_product_dict['source'] = msg_as_dict['source']
         relevant_product_dict['_id'] = str(relevant_product_dict['_id'])
         return dumps(relevant_product_dict)
 

@@ -72,7 +72,7 @@ def fetch_by_id(source: str, _id: str):
     else:
         # querying the db and if nothing there querying the web.
         record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
-            {'_id': _id, 'source': f'{source}.com'}))
+            {'_id': _id, 'source': source}))
         record = loads(record)
 
         if record == None:
@@ -103,6 +103,6 @@ def filter_by_price(source: str):
         record = rabbit.send_n_receive(RABBIT_DB_FILTER_QUEUE, dumps(
             {'$gte': int(greater_than_or_equal),
              '$lte': int(lesser_than_or_equal),
-             'source': f'{source}.com'}))
+             'source': source}))
         record = loads(record)
         return jsonify(record)

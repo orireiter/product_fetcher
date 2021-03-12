@@ -24,7 +24,7 @@ services:
     command: --quiet
     
   amazon_fetcher:
-    image: orireiter/walmart_amazon_api:amazon_fetcher_0.0.7
+    image: orireiter/walmart_amazon_api:amazon_fetcher_0.0.8
     deploy:
       replicas: 1
     networks:
@@ -33,7 +33,7 @@ services:
       - ./config.yml:/app/config.yml
 
   walmart_fetcher:
-    image: orireiter/walmart_amazon_api:walmart_fetcher_0.0.7
+    image: orireiter/walmart_amazon_api:walmart_fetcher_0.0.8
     deploy:
       replicas: 1
     networks:
@@ -43,7 +43,7 @@ services:
       - ./walmart_headers.json:/app/walmart_headers.json
 
   walmart_header_fetcher:
-    image: orireiter/walmart_amazon_api:walmart_header_fetcher_0.0.7
+    image: orireiter/walmart_amazon_api:walmart_header_fetcher_0.0.8
     deploy:
       replicas: 1
     networks:
@@ -53,7 +53,7 @@ services:
       - ./walmart_headers.json:/app/walmart_headers.json
 
   web_server:
-    image: orireiter/walmart_amazon_api:web_server_0.0.7
+    image: orireiter/walmart_amazon_api:web_server_0.0.8
     deploy:
       replicas: 1
     networks:
@@ -65,7 +65,7 @@ services:
       - 80:80
 
   db_reader_by_id:
-    image: orireiter/walmart_amazon_api:db_reader_by_id_0.0.7
+    image: orireiter/walmart_amazon_api:db_reader_by_id_0.0.8
     deploy:
       replicas: 4
     networks:
@@ -74,7 +74,7 @@ services:
       - ./config.yml:/app/config.yml
 
   db_reader_by_filter:
-    image: orireiter/walmart_amazon_api:db_reader_by_filter_0.0.7
+    image: orireiter/walmart_amazon_api:db_reader_by_filter_0.0.8
     deploy:
       replicas: 1
     networks:
@@ -83,7 +83,7 @@ services:
       - ./config.yml:/app/config.yml
 
   db_writer:
-    image: orireiter/walmart_amazon_api:db_writer_0.0.7
+    image: orireiter/walmart_amazon_api:db_writer_0.0.8
     deploy:
       replicas: 1
     networks:

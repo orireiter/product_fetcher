@@ -59,12 +59,13 @@ def read_from_db(msg):
 
     # if there was no result from the db, the message is
     # redirected to the correct queue.
-    elif msg_as_dict['source'] == 'walmart.com':
+    elif msg_as_dict['source'] == 'walmart':
         return {'redirect_to': REDIRECTION_QUEUE_WALMART, 'exchange': ''}
-    elif msg_as_dict['source'] == 'amazon.com':
+    elif msg_as_dict['source'] == 'amazon':
         return {'redirect_to': REDIRECTION_QUEUE_AMAZON, 'exchange': ''}
     else:
-        pass
+        print(f'couldn\'t use -> {msg}' )
+        return dumps(None)
 
 
 # This function starts listening to the given rabbit queue,

@@ -13,8 +13,8 @@ mongodb:
   host: mongodb
   db: products
   collections:
-    amazon.com: amazon
-    walmart.com: walmart
+    amazon: amazon
+    walmart: walmart
   ttl: 86400
 
 amazon:

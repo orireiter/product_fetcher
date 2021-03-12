@@ -1,1 +1,1 @@
-docker build -t walmart_fetcher:0.0.7 -f .\docker\walmart_fetcher\Dockerfile .
+docker build -t walmart_fetcher:0.0.8 -f .\docker\walmart_fetcher\Dockerfile .
