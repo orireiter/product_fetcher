@@ -8,6 +8,10 @@
     "applications": {
         "flask_app": {
             "type": "python 3",
+            "limits": {
+                "timeout": 15,
+                "requests": 20
+            },
             "user": "root",
             "group": "root",
             "working_directory": "/app/",
@@ -17,7 +21,7 @@
             "callable": "app",
             "processes": {
                 "max": 20,
-                "spare": 5,
+                "spare": 0,
                 "idle_timeout": 30
             }
         }
