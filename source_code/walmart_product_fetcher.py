@@ -1,4 +1,5 @@
 import requests
+import datetime
 from json import loads, dumps
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
 from pyTools.extra_tools import get_conf, dictionary_key_repacker
@@ -23,7 +24,8 @@ RABBIT_WALMART_QUEUE = get_conf('rabbitmq', 'queues', 'walmart_queue')
 WALMART_API = get_conf('walmart', 'api')
 WALMART_HEADERS_JSON = get_conf('walmart', 'headers_json')
 WALMART_JSON_KEYS = get_conf('walmart', 'keys')
-RABBIT_RESPONSE_EXCHANGE = get_conf('rabbitmq', 'exchanges', 'fetcher_writer_exchange')
+RABBIT_RESPONSE_EXCHANGE = get_conf(
+    'rabbitmq', 'exchanges', 'fetcher_writer_exchange')
 DEPENDS_ON = get_conf('walmart', 'depends_on')
 
 # waiting for dependencies before starting service
@@ -42,16 +44,19 @@ def fetch_walmart_prdct(msg):
     # First the json containing headers is loaded.
     with open(WALMART_HEADERS_JSON, 'r') as file:
         walmart_headers = loads(file.read())
-    
-    msg_as_dict = loads(msg)
-    # only the id value is needed to query the remote api
-    msg_id = msg_as_dict['_id']
-    # The API is queried, along with the headers.
+
     try:
+        msg_as_dict = loads(msg)
+        # only the id value is needed to query the remote api
+        msg_id = msg_as_dict['_id']
+        # The API is queried, along with the headers.
+
         product = requests.get(WALMART_API + msg_id,
                                headers=walmart_headers)
     except requests.exceptions.ConnectionError:
-        return "ERROR: Couldn't connect to amazon API"
+        print(f'{datetime.datetime.now()} -> ERROR: Couldn\'t connect'
+              f'to walmart API with {msg_as_dict}')
+        return dumps(None)
 
     # If the status code isn't 200, there was a problem.
     # Otherwise, the result (regarding the product)
@@ -60,7 +65,7 @@ def fetch_walmart_prdct(msg):
         full_product_dict = loads(product.text)
         relevant_product_dict = dictionary_key_repacker(
             full_product_dict, WALMART_JSON_KEYS)
-        
+
         # certain values are normalized before writing to db.
         relevant_product_dict['source'] = msg_as_dict['source']
         relevant_product_dict['_id'] = str(relevant_product_dict['_id'])
@@ -75,4 +80,5 @@ def fetch_walmart_prdct(msg):
 # the message as a parameter.
 # The return of the callback function is sent back to RabbitMQ.
 # For more information check the class docstrings.
-wlmrt_fetcher.receive_n_send_many(RABBIT_WALMART_QUEUE, fetch_walmart_prdct, RABBIT_RESPONSE_EXCHANGE)
+wlmrt_fetcher.receive_n_send_many(
+    RABBIT_WALMART_QUEUE, fetch_walmart_prdct, RABBIT_RESPONSE_EXCHANGE)

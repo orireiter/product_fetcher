@@ -70,18 +70,20 @@ def fetch_by_id(source: str, _id: str):
     elif not re.search(r'^[0-9A-Z]+$', str(_id)):
         return('ERROR: product ID given can contain only uppercase letters and numbers.'), 403
     else:
-        # querying the db and if nothing there querying the web.
-        record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
-            {'_id': _id, 'source': source}))
-        record = loads(record)
+        try:
+            # querying the db and if nothing there querying the web.
+            record = rabbit.send_n_receive(RABBIT_DB_READER_QUEUE, dumps(
+                {'_id': _id, 'source': source}))
+            record = loads(record)
 
-        if record == None:
-            return jsonify({
-                "error": "There are currently no listings for this product or could not fetch details about the product"
-            }), 404
-        else:
-            return jsonify(record)
-
+            if record == None:
+                return jsonify({
+                    'error': 'There are currently no listings for this product or could not fetch details about the product'
+                }), 404
+            else:
+                return jsonify(record)
+        except:
+            return jsonify({'error': 'could not fetch details about the product'}), 404
 
 @app.route('/filter/<string:source>', methods=['GET'])
 def filter_by_price(source: str):
@@ -99,10 +101,13 @@ def filter_by_price(source: str):
     elif not re.search(r'^[0-9]+$', str(lesser_than_or_equal)):
         return('ERROR: price values can contain only numbers.'), 403
     else:
-        # querying the db and returning the response.
-        record = rabbit.send_n_receive(RABBIT_DB_FILTER_QUEUE, dumps(
-            {'$gte': int(greater_than_or_equal),
-             '$lte': int(lesser_than_or_equal),
-             'source': source}))
-        record = loads(record)
-        return jsonify(record)
+        try:
+            # querying the db and returning the response.
+            record = rabbit.send_n_receive(RABBIT_DB_FILTER_QUEUE, dumps(
+                {'$gte': int(greater_than_or_equal),
+                '$lte': int(lesser_than_or_equal),
+                'source': source}))
+            record = loads(record)
+            return jsonify(record)
+        except:
+            return jsonify({'error': 'could not fetch details about the products'}), 404

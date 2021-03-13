@@ -1,3 +1,4 @@
+import datetime
 from json import loads, dumps
 from pyTools.mongo import db_connect
 from pyTools.RabbitMQ_Class.RabbitClass import Rabbit
@@ -36,21 +37,24 @@ db_reader.declare_queue(RABBIT_DB_READER_QUEUE, durable=True)
 # The function that will be executed when a message is consumed.
 # It will turn the message into a dictionary and query the DB with it.
 def read_from_db(msg):
-    # First, the message is loaded to a dict.
-    msg_as_dict = loads(msg)
-
-    # Assigning the collection according to the source of the product.
-    # This is not a constant because this function will serve multiple
-    # collections.
-    collection = get_conf('mongodb', 'collections', msg_as_dict['source'])
-
-    # Creating a full connection string to the DB.
-    mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
-
     try:
+        # First, the message is loaded to a dict.
+        msg_as_dict = loads(msg)
+
+        # Assigning the collection according to the source of the product.
+        # This is not a constant because this function will serve multiple
+        # collections.
+        collection = get_conf('mongodb', 'collections', msg_as_dict['source'])
+
+        # Creating a full connection string to the DB.
+        mongo_connection = db_connect(MONGO_HOST, MONGO_DB, collection)
+
         # The DB is queried with the msg dictionary as a filter.
-        result = mongo_connection.find_one(msg_as_dict, projection={'ttl': False})
+        result = mongo_connection.find_one(
+            msg_as_dict, projection={'ttl': False})
     except:
+        print(f'{datetime.datetime.now()} -> ERROR: couldn\'t contact'
+        f' mongo db with {msg}')
         result = None
 
     if result != None:
@@ -64,7 +68,7 @@ def read_from_db(msg):
     elif msg_as_dict['source'] == 'amazon':
         return {'redirect_to': REDIRECTION_QUEUE_AMAZON, 'exchange': ''}
     else:
-        print(f'couldn\'t use -> {msg}' )
+        print(f'couldn\'t use -> {msg}')
         return dumps(None)
 
 

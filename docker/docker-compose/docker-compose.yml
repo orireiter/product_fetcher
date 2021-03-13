@@ -6,6 +6,9 @@ services:
       - yaballe_API
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     ports:
       - 15672:15672
     container_name: rabbitmq
@@ -14,6 +17,9 @@ services:
     image: mongo
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     container_name: mongodb
     ports:
       - 27017:27017
@@ -27,6 +33,9 @@ services:
     image: orireiter/walmart_amazon_api:amazon_fetcher_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -36,6 +45,9 @@ services:
     image: orireiter/walmart_amazon_api:walmart_fetcher_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -46,6 +58,9 @@ services:
     image: orireiter/walmart_amazon_api:walmart_header_fetcher_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -56,6 +71,9 @@ services:
     image: orireiter/walmart_amazon_api:web_server_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -68,6 +86,9 @@ services:
     image: orireiter/walmart_amazon_api:db_reader_by_id_0.0.8
     deploy:
       replicas: 4
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -77,6 +98,9 @@ services:
     image: orireiter/walmart_amazon_api:db_reader_by_filter_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
@@ -86,6 +110,9 @@ services:
     image: orireiter/walmart_amazon_api:db_writer_0.0.8
     deploy:
       replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - yaballe_API
     volumes:
